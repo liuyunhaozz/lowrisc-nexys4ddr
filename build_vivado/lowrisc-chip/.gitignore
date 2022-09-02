@@ -1,0 +1,8 @@
+target/
+project/target
+*.swp
+*~
+.addons-dont-touch
+riscv/
+tools/
+lib/

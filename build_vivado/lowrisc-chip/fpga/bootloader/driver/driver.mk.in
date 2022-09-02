@@ -1,0 +1,7 @@
+driver_subproject_deps = \
+
+driver_hdrs = \
+  uart.h \
+
+driver_c_srcs = \
+  uart.c \

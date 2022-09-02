@@ -1,0 +1,39 @@
+# Run in container-based environment
+sudo: required
+dist: trusty
+group: edge  # Add this
+git:
+  submodules: false
+
+# Using the precompiled toolchain from docker
+services:
+  - docker
+
+# define test
+env:
+  global:
+    - DOCKER_TOP=/opt/lowrisc
+    - DOCKER_TAG=rocket-v1.0
+  matrix:
+    - CONFIG=LoRCDefaultConfig     TEST_CASE=run-asm-tests
+
+# tag is not enabled for now
+#    - CONFIG=TagConfig         TEST_CASE=run-asm-tests
+#    - CONFIG=TagConfig         TEST_CASE=run-tag-tests
+
+# actual test build
+
+before_install:
+ - git submodule update --init --recursive rocket-chip
+ - docker pull lowrisc/lowrisc-docker:$DOCKER_TAG
+
+before_script:
+ - docker create -v $PWD:/opt/lowrisc -e TOP=/opt/lowrisc -t --name=test lowrisc/lowrisc-docker:$DOCKER_TAG
+ - docker start test
+
+script:
+ - docker exec test make -C $DOCKER_TOP/rocket-chip/vsim CONFIG=$CONFIG $TEST_CASE
+
+after_script:
+ - docker stop test
+ - docker rm test
